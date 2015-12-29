@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+
+<head>
+    <title></title>
+    <link href="bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .st-sort-ascent:before {
+            content: '\25B2';
+        }
+
+        .st-sort-descent:before {
+            content: '\25BC';
+        }
+
+        .st-selected {
+            background-color:blue !important ;
+            color: white  !important ;
+        }
+         .st-selected td{
+            background-color:blue !important ;
+            color: white  !important ;
+        }
+    </style>
+</head>
+
+
+<body ng-controller="TableController">
+
+
+
+    <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">
+        <thead>
+            <tr>
+                <td></td>
+                <td colspan="2">
+                    <input type="text" st-search="Title" placeholder="Search Title" st-delay="false" class="form-control">
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2">
+
+                    <input type="text" st-search="Content" placeholder="Search Content" st-delay="false" class="form-control">
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2">
+
+                    <input type="text" st-search="PublishDate" placeholder="Search PublishDate" st-delay="false" class="form-control">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><td>
+                    <select st-search="Status" st-delay="false" class="form-control">
+                        <option value="">Select Status</option>
+                        <option value="Recent">Recent</option>
+                        <option value="Most Viewed">Most Viewed</option>
+                        <option value="Featured">Featured</option>
+                        <option value="Removed">Removed</option>
+                        <option value="Featured">Featured</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><td>
+                    <select st-search="IsActive" st-delay="false" class="form-control">
+                        <option value="">Select IsActive</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2">
+
+                    <select st-search="IsCommentAllowed" st-delay="false" class="form-control">
+                        <option value="">Comment Allowed?</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2">
+
+                    <select st-search="IsRatingAllowed" st-delay="false" class="form-control">
+                        <option value="">Rating Allowed?</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <th colspan="5"><input st-search="" st-delay="false" class="form-control" placeholder="global search ..." type="text" /></th>
+            </tr>
+            <tr>
+                <th cs-select-all="row"></th>
+                <th st-sort="Title" st-delay="false">Title</th>
+                <th st-sort="Content" st-delay="false">Content</th>
+                <th st-sort="PublishDate" st-delay="false">Published Date</th>
+                <th st-sort="Status" st-delay="false">Status</th>
+                <th>Active</th>
+                <th>Comments Allowed</th>
+                <th>Rating Allowed</th>
+
+            </tr>
+
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in displayedCollection">
+                <td cs-select="row"></td>
+                <td>{{row.Title}}</td>
+                <td>{{row.Content}}</td>
+                <td>{{row.PublishDate}}</td>
+                <td>{{row.Status}}</td>
+                <td><input type="checkbox" ng-model="row.IsActive" disabled /></td>
+                <td><input type="checkbox" ng-model="row.IsCommentAllowed" disabled /></td>
+                <td><input type="checkbox" ng-model="row.IsRatingAllowed" disabled /></td>
+
+                <td>
+                    <button type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger">
+                        X
+                    </button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <button type="button" ng-click="addRandomItem(row)" class="btn btn-sm btn-success">
+        <i class="glyphicon glyphicon-plus">
+        </i> Add random item
+    </button>
+
+
+    <script type="text/javascript" src="angular.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script src="smart-table.min.js"></script>
+
+
+</body>
+</html>

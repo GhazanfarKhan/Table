@@ -1,0 +1,6 @@
+c:\users\mgkhan\documents\visual studio 2013\Projects\ObjectTable\ObjectTable\bin\ObjectTable.dll.config
+c:\users\mgkhan\documents\visual studio 2013\Projects\ObjectTable\ObjectTable\bin\ObjectTable.dll
+c:\users\mgkhan\documents\visual studio 2013\Projects\ObjectTable\ObjectTable\bin\ObjectTable.pdb
+c:\users\mgkhan\documents\visual studio 2013\Projects\ObjectTable\ObjectTable\obj\Debug\ObjectTable.csprojResolveAssemblyReference.cache
+c:\users\mgkhan\documents\visual studio 2013\Projects\ObjectTable\ObjectTable\obj\Debug\ObjectTable.dll
+c:\users\mgkhan\documents\visual studio 2013\Projects\ObjectTable\ObjectTable\obj\Debug\ObjectTable.pdb
