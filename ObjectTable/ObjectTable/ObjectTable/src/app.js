@@ -11,7 +11,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
             Status: 'Recent',
             IsActive: true,
             IsCommentAllowed: false,
-            IsRatingAllowed: true
+            IsRatingAllowed: true,
+            isSelected:false
 
         },
         {
@@ -22,7 +23,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
             Status: 'Recent',
             IsActive: true,
             IsCommentAllowed: false,
-            IsRatingAllowed: false
+            IsRatingAllowed: false,
+            isSelected: false
         },
         {
             Id: 3,
@@ -32,7 +34,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
             Status: 'Most Viewed',
             IsActive: true,
             IsCommentAllowed: false,
-            IsRatingAllowed: true
+            IsRatingAllowed: true,
+            isSelected: false
         },
         {
             Id: 4,
@@ -42,7 +45,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
             Status: 'Featured',
             IsActive: true,
             IsCommentAllowed: true,
-            IsRatingAllowed: true
+            IsRatingAllowed: true,
+            isSelected: false
         },
         {
             Id: 5,
@@ -52,7 +56,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
             Status: 'Removed',
             IsActive: false,
             IsCommentAllowed: false,
-            IsRatingAllowed: false
+            IsRatingAllowed: false,
+            isSelected: false
         },
         {
             Id: 6,
@@ -62,7 +67,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
             Status: 'Most Viewed',
             IsActive: true,
             IsCommentAllowed: true,
-            IsRatingAllowed: true
+            IsRatingAllowed: true,
+            isSelected: false
         },
         {
             Id: 7,
@@ -72,7 +78,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
             Status: 'Featured',
             IsActive: true,
             IsCommentAllowed: false,
-            IsRatingAllowed: true
+            IsRatingAllowed: true,
+            isSelected: false
         },
          {
              Id: 8,
@@ -82,7 +89,8 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
              Status: 'Pending',
              IsActive: false,
              IsCommentAllowed: true,
-             IsRatingAllowed:true
+             IsRatingAllowed: true,
+             isSelected: false
          }
     ];
 
@@ -142,24 +150,29 @@ app.controller('TableController', ['$scope', '$filter', function ($scope, $filte
 app.directive('csSelect', function () {
     return {
         require: '^stTable',
-        template: '<input type="checkbox"/>',
+        template: '<input type="checkbox" ng-model="isChecked"/>',
         scope: {
             row: '=csSelect'
         },
         link: function (scope, element, attr, ctrl) {
-        
+            scope.isChecked = false;
+
             element.bind('change', function (evt) {
                 scope.$apply(function () {
                     ctrl.select(scope.row, 'multiple');
                 });
             });
+
+
+
             scope.$watch('row.isSelected', function (newValue, oldValue) {
                 if (newValue === true) {
-                    console.log(scope.row);
-                 
+                    scope.isChecked = true;
 
                     element.parent().addClass('st-selected');
                 } else {
+                    scope.isChecked = false;
+
                     element.parent().removeClass('st-selected');
                 }
             });
@@ -171,30 +184,26 @@ app.directive('csSelect', function () {
 app.directive('csSelectAll', function () {
     return {
         require: '^stTable',
-        template: '<input type="checkbox"/>',
+        template: '<input type="checkbox" ng-model="isChecked"/>',
         scope: {
-            row: '=csSelectAll'
+            rows: '=csSelectAll'
         },
         link: function (scope, element, attr, ctrl) {
+            scope.isChecked = false;
 
-            element.bind('change', function (evt) {
-                scope.$apply(function () {
-                    alert();
-                    console.log(scope.row);
-                    //ctrl.select(scope.row, 'multiple');
-                });
-               
+
+            scope.$watch('isChecked', function (newValue, oldValue) {
+                if (newValue === true) {
+                    angular.forEach(scope.rows, function (value, key) {
+                        value.isSelected = true;
+                       });
+                } else {
+
+                    angular.forEach(scope.rows, function (value, key) {
+                        value.isSelected = false;
+                    });
+                }
             });
-            //scope.$watch('row.isSelected', function (newValue, oldValue) {
-            //    if (newValue === true) {
-            //        console.log(scope.row);
-
-
-            //        element.parent().addClass('st-selected');
-            //    } else {
-            //        element.parent().removeClass('st-selected');
-            //    }
-            //});
 
         }
     };
