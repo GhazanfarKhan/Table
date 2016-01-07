@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="myApp">
+<head>
+    <title></title>
+    <link href="bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .st-sort-ascent:before {
+            content: '\25B2';
+        }
+
+        .st-sort-descent:before {
+            content: '\25BC';
+        }
+
+        .st-selected {
+            background-color: blue !important;
+            color: white !important;
+        }
+
+            .st-selected td {
+                background-color: blue !important;
+                color: white !important;
+            }
+
+
+        .lr-drop-target-before {
+            border-left: 3px dotted orange;
+            background-color: lightblue !important;
+        }
+
+        .lr-drop-target-after {
+            border-right: 3px dotted orange;
+            background-color: lightblue !important;
+        }
+    </style>
+
+
+
+</head>
+<body ng-controller="mainCtrl">
+    <div class="table-container">
+        <table st-table="rowCollection" class="table table-striped">
+            <thead>
+                <tr>
+                    <th ng-repeat="col in columns" st-sort="{{col}}">{{col}}</th>
+                </tr>
+                <tr>
+                    <th>
+                        <input st-search="firstName" id="firstName" placeholder="search for firstname" class="input-sm form-control" type="search" />
+                    </th>
+                    <th colspan="4">
+                        <input st-search placeholder="global search" class="input-sm form-control" type="search" />
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in rowCollection">
+                    <td ng-repeat="col in columns">{{row[col]}}</td>
+
+
+                </tr>
+            </tbody>
+        </table>
+
+        <button ng-click="changeSearch()">Change Search</button>
+    </div>
+    <div ng-show="isLoading" class="loading-indicator"></div>
+
+
+    <script src="angular.min.js"></script>
+    <script src="smart-table.min.js"></script>
+    <script src="app2.js"></script>
+</body>
+</html>

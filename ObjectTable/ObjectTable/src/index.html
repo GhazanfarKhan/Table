@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+
+<head>
+    <title></title>
+    <link href="bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="bootstrap/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
+
+    <style>
+        table {
+            table-layout: fixed;
+            width: 300px;
+        }
+
+        .st-sort-ascent:before {
+            content: '\25B2';
+        }
+
+        .st-sort-descent:before {
+            content: '\25BC';
+        }
+
+        .st-selected {
+            background-color: blue !important;
+            color: white !important;
+        }
+
+            .st-selected td {
+                background-color: blue !important;
+                color: white !important;
+            }
+
+
+        .lr-drop-target-before {
+            border-left: 3px dotted orange;
+            background-color: lightblue !important;
+        }
+
+        .lr-drop-target-after {
+            border-right: 3px dotted orange;
+            background-color: lightblue !important;
+        }
+
+        th {
+            text-align: center;
+        }
+
+        td {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        #footerExport td {
+            cursor: pointer;
+            text-align: center;
+            border: 1px solid #ccc;
+            border: none;
+        }
+
+
+        
+    </style>
+</head>
+
+
+<body ng-controller="TableController">
+    <!--Update Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Batch Update</h4>
+                </div>
+                <div class="modal-body">
+                    <form ng-submit="batchUpdate()" name="BatchUpdateForm" novalidate>
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" ng-model="topic.Title" placeholder="Enter Title" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Content</label>
+                            <input type="text" ng-model="topic.Content" placeholder="Enter Content" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" ng-model="topic.Status" required>
+                                <option value="">Select Status</option>
+                                <option value="Recent">Recent</option>
+                                <option value="Most Viewed">Most Viewed</option>
+                                <option value="Featured">Featured</option>
+                                <option value="Removed">Removed</option>
+                                <option value="Featured">Featured</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>IsActive</label>
+                            <select class="form-control" ng-model="topic.IsActive" required>
+                                <option value="">Select IsActive</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>IsCommentAllowed</label>
+                            <select class="form-control" ng-model="topic.IsCommentAllowed" required>
+                                <option value="">Select Option</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>IsRatingAllowed</label>
+                            <select class="form-control" ng-model="topic.IsRatingAllowed" required>
+                                <option value="">Select Option</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" ng-disabled="!BatchUpdateForm.$valid">Save</button>
+
+                            <button type="button" class="btn btn-default" ng-click="hide()">Close</button>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!--Config Modal-->
+
+    <div id="configModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Columns Selection</h4>
+                </div>
+                <div class="modal-body">
+                    <form name="ConfigForm" novalidate>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <ul>
+                                        <li ng-repeat="col in columns">
+                                            <input type="checkbox" ng-model="col.show" /><label>{{col.header}}</label>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <h4>Save your filters</h4>
+                                <p><b>Id</b>:{{filters.Id}}</p>
+                                <p><b>Title</b>:{{filters.Title}}</p>
+                                <p><b>Content</b>:{{filters.Content}}</p>
+                                <p><b>Status</b>:{{filters.Status}}</p>
+                                <p><b>IsActive</b>:{{filters.IsActive}}</p>
+                                <p><b>IsCommentAllowed</b>:{{filters.IsCommentAllowed}}</p>
+                                <p><b>IsRatingAllowed</b>:{{filters.IsRatingAllowed}}</p>
+
+                            </div>
+
+
+                        </div>
+
+
+
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" ng-click="saveConfig()">Save</button>
+
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <div class="container">
+        <div class="row">
+            <button type="button" ng-click="addRandomItem()" class="btn btn-success">
+                Add random item
+            </button>
+            <button type="button" ng-click="deleteItem()" class="btn btn-danger">
+                Delete Batch
+            </button>
+            <button type="button" ng-click="updateModal()" class="btn btn-warning">
+                Update Batch
+            </button>
+            <button type="button" ng-click="showConfigModal()" class="btn btn-warning">
+                Config
+            </button>
+            <br />
+            <br />
+
+
+        </div>
+
+        <div class="row">
+            <table>
+                <tr id="footerExport">
+                    <td id="exportexcel" ng-click="export('excel')"><img src="../icons/xls.png" title="Export to Excel" /></td>
+                    <td id="exportpdf" ng-click="export('pdf')"><img src="../icons/pdf.png" title="Export to PDF" /></td>
+                    <td id="exportimage" ng-click="export('png')"><img src="../icons/png.png" title="Export to PNG" /></td>
+                    <td id="exportcsv" ng-click="export('csv')"><img src="../icons/csv.png" title="Export to CSV" /></td>
+                    <td id="exportword" ng-click="export('doc')"><img src="../icons/word.png" title="Export to Word" /></td>
+                    <td id="exporttxt" ng-click="export('txt')"><img src="../icons/txt.png" title="Export to TXT" /></td>
+                    <td id="exportxml" ng-click="export('xml')"><img src="../icons/xml.png" title="Export to XML" /></td>
+                    <td id="exportppt" ng-click="export('powerpoint')"><img src="../icons/ppt.png" title="Export to PPT" /></td>
+                </tr>
+            </table>
+            <br />
+            <br />
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <label>Fields :</label>
+                <select class="form-control" placeholder="Crriteria">
+                    <option value="Id">Id</option>
+                    <option value="Title">Title</option>
+                    <option value="Content">Content</option>
+                    <option value="Status">Status</option>
+                    <option value="IsActive">Active</option>
+                    <option value="IsCommentAllowed">Comments Allowed</option>
+                    <option value="IsRatingAllowed">Rating Allowed</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>Criteria :</label>
+                <select class="form-control" placeholder="Criteria">
+                    <option value="Contains">Contains</option>
+                    <option value="StartWith">Start With</option>
+                    <option value="EndWith">End With</option>
+                     <option value="Equal">Equal</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label></label>
+                <input type="text" placeholder="Search" class="form-control" />
+            </div>
+           
+            <div class="col-md-2">
+                <button id="advance-search" class="btn btn-default"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+
+                <button id="advance-search" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+            </div>
+            <div class="col-md-2">
+
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Dropdown
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </div>
+
+
+            </div>
+
+
+            </div>
+
+        <div class="row">
+            <table st-table="displayedCollection" st-safe-src="rowCollection" id="myTable" class="table table-striped fadein fadeout">
+                <thead>
+                    <!--Filters-->
+
+                    <tr>
+                        <td>
+                            <select class="form-control" placeholder="Select Filter" ng-model="selectedFilter" ng-change="selectFilter()">
+                                <option value="0">Default</option>
+                                <option ng-repeat="option in myfilter" value="{{option.Id}}">{{option.name}}</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" ng-model="filters.Id" placeholder="Select Id" class="form-control">
+                        </td>
+                        <td>
+                            <input type="text" ng-model="filters.Title" placeholder="Select Title" class="form-control">
+                        </td>
+                        <td>
+                            <input type="text" ng-model="filters.Content" placeholder="Select Content" class="form-control">
+                        </td>
+                        <td>
+                            <select ng-model="filters.Status" class="form-control">
+                                <option value="">Select Status</option>
+                                <option value="Recent">Recent</option>
+                                <option value="Most Viewed">Most Viewed</option>
+                                <option value="Featured">Featured</option>
+                                <option value="Removed">Removed</option>
+                                <option value="Featured">Featured</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select ng-model="filters.IsActive" class="form-control">
+                                <option value="">Select IsActive</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+
+                            </select>
+                        </td>
+                        <td>
+                            <select ng-model="filters.IsCommentAllowed" class="form-control">
+                                <option value="">Select IsCommentAllowed</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+
+                            </select>
+                        </td>
+                        <td>
+                            <select ng-model="filters.IsRatingAllowed" class="form-control">
+                                <option value="">Select IsRatingAllowed</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+
+                            </select>
+                        </td>
+                    </tr>
+                    <!--Headers-->
+
+
+
+                    <tr>
+                        <th cs-select-all="rowCollection"></th>
+                        <th lr-drag-src="headers" lr-drop-target="headers" st-delay="false" ng-repeat="col in columns" ng-show="col.show" st-sort="{{col.field}}">{{col.header}}</th>
+                    </tr>
+
+                    <!--Global Search-->
+                    <!--<tr>
+                        <th colspan="5"><input st-search="" st-delay="false" class="form-control" placeholder="global search ..." type="text" /></th>
+                    </tr>-->
+
+
+                </thead>
+                <tbody>
+                    <tr dir-paginate="row in displayedCollection | filter:{Id:filters.Id} | filter:{Title:filters.Title} | filter:{Content:filters.Content} | filter:{Status:filters.Status} | filter:{IsActive:filters.IsActive} | filter:{IsCommentAllowed:filters.IsCommentAllowed} | filter:{IsRatingAllowed:filters.IsRatingAllowed} | itemsPerPage:criteria.pagesize" current-page="criteria.page">
+                        <td cs-select="row"></td>
+                        <td ng-repeat="col in columns" ng-show="col.show">
+                            <span ng-if="col.field!='IsActive' && col.field!='IsRatingAllowed' && col.field!='IsCommentAllowed'">
+                                {{row[col.field]}}
+                            </span>
+                            <span ng-if="col.field == 'IsActive' || col.field == 'IsRatingAllowed' || col.field == 'IsCommentAllowed'">
+                                <input type="checkbox" ng-model="row[col.field]" disabled />
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger">X</button>
+
+                        </td>
+                    </tr>
+
+
+                </tbody>
+
+
+
+            </table>
+
+        </div>
+
+
+        <div class="row" style="text-align:center;">
+            <dir-pagination-controls max-size="5"
+                                     direction-links="true"
+                                     boundary-links="true">
+            </dir-pagination-controls>
+        </div>
+
+        <div class="row" style="background-color:lightcyan;">
+            <div class="col-md-6">
+                Showing: {{(criteria.page -1) * criteria.pagesize + 1}} -
+                {{ ((criteria.page -1) * criteria.pagesize + paging.showing)}}
+                of {{paging.total}} Records
+            </div>
+            <div class="col-md-6">
+                <div class="pull-right">
+                    Page: <input type='number'
+                                 ng-model='criteria.page'
+                                 min="1"
+                                 max="{{paging.totalpages}}"
+                                 style='width:70px;' />
+                    of {{paging.totalpages}}
+                    with page size <select ng-model="criteria.pagesize"
+                                           ng-options="obj as obj for obj in paging.pagingOptions" />
+                </div>
+               
+            </div>
+        </div>
+
+
+
+        </div>
+        
+    <script type="text/javascript" src="angular.min.js"></script>
+    <script src="lrDragNDrop.js"></script>
+    <script src="angular-animate.min.js"></script>
+    <script src="jquery-1.10.2.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="smart-table.min.js"></script>
+    <script src="linq.min.js"></script>
+     <script src="dirPagination.js"></script>
+
+    <script type="text/javascript" src="app.js"></script>
+
+
+    <script src="../Contents/tableExport.js"></script>
+    <script src="../Contents/jquery.base64.js"></script>
+    <script src="../Contents/html2canvas.js"></script>
+    <script src="../Contents/jspdf/libs/base64.js"></script>
+    <script src="../Contents/jspdf/libs/sprintf.js"></script>
+    <script src="../Contents/jspdf/jspdf.js"></script>
+
+  
+</body>
+</html>
