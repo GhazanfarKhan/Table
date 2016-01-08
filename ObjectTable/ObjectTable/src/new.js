@@ -1,6 +1,6 @@
 ﻿var app = angular.module('myApp', ['smart-table', 'lrDragNDrop', 'ngAnimate', 'angularUtils.directives.dirPagination', 'ui.sortable']);
-
-app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope', 'CommonOperation', function ($scope, $filter, $timeout, $rootScope, CommonOperation) {
+ 
+app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope', 'CommonOperation','$localstorage', function ($scope, $filter, $timeout, $rootScope, CommonOperation, $localstorage) {
     $scope.id = 1;
     $scope.selectedFilter = '';
 
@@ -14,6 +14,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
     ];
 
     $scope.savedSearch = [];
+
     $scope.criteria = {
         page: 1,
         pagesize: 5,
@@ -53,8 +54,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         "IsRatingAllowed": ""
     };
 
-    $scope.myfilter = [];
-
+    
     //Sample datas
     var topic = [
          {
@@ -152,22 +152,32 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         }
     }
 
-    $scope.originalColumns = [];
-    $scope.newCol = [];
+   
+    if ($localstorage.getObject('columns') != null) {
+        $scope.columns = angular.copy($localstorage.getObject('columns'));
+    }
+    else {
+        $scope.columns = [
+       { header: 'Id', field: 'Id', show: true },
+       { header: 'Title', field: 'Title', show: true},
+       { header: 'Content', field: 'Content', show: true },
+       { header: 'Status', field: 'Status', show: true },
+       { header: 'Active', field: 'IsActive', show: true},
+       { header: 'Comments Allowed', field: 'IsCommentAllowed', show: true},
+       { header: 'Rating Allowed', field: 'IsRatingAllowed', show: true }
 
-    $scope.columns = [
-        { header: 'Id', field: 'Id', show: true, filterValue: '' },
-        { header: 'Title', field: 'Title', show: true, filterValue: '' },
-        { header: 'Content', field: 'Content', show: true, filterValue: '' },
-        { header: 'Status', field: 'Status', show: true, filterValue: '' },
-        { header: 'Active', field: 'IsActive', show: true, filterValue: '' },
-        { header: 'Comments Allowed', field: 'IsCommentAllowed', show: true, filterValue: '' },
-        { header: 'Rating Allowed', field: 'IsRatingAllowed', show: true, filterValue: '' }
+        ];
+    }
+   
+    //watch for column change and store in local Storage
+    $scope.$watch('columns', function (newValue, oldValue) {
+        if (!angular.equals(newValue, oldValue)) {
+            $localstorage.setObject('columns', $scope.columns);
+         }
+    }, true);
 
-    ];
 
-    $scope.originalColumns = angular.copy($scope.columns);
-
+ 
 
     $scope.rowCollection = [];
 
@@ -182,11 +192,14 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
     $scope.addRandomItem = function addRandomItem() {
         $scope.rowCollection.push(generateRandomItem(id));
         id++;
-        $scope.search();
-        //paging
         $scope.$emit('ItemAdded', $scope.rowCollection[$scope.rowCollection.length - 1]);
+
+        //paging
         if ($scope.criteria.page == 0) {
             $scope.criteria.page = 1;
+        }
+        else {
+            $scope.search();
         }
     };
 
@@ -195,10 +208,13 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         if (index !== -1) {
             //for paging alphabets
             $scope.$emit('ItemDeleted', $scope.rowCollection[index]);
-
             $scope.rowCollection.splice(index, 1);
+           
+            //paging
             $scope.search();
-
+            if ($scope.rowCollection.length == 0) {
+                $scope.criteria.page = 0;
+            }
         }
     }
     //batch delete
@@ -216,7 +232,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
 
                 //for paging alphabets
                 $scope.$emit('ItemDeleted', $scope.rowCollection[index]);
-
+               
                 $scope.rowCollection.splice(index, 1);
                 $scope.search();
 
@@ -317,110 +333,28 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         $('#updateModal').modal('hide');
 
     }
-    //config modal
-    $scope.showConfigModal = function () {
-        $('#configModal').modal('show');
-    };
+    
 
-    $scope.saveConfig = function () {
-        var header = '';
-        var field = '';
-        var visibility = '';
-        var filterColumn = '';
-        var filterValue = '';
-
-
-        for (var i = 0; i < $scope.columns.length; i++) {
-            header += $scope.columns[i].header;
-            if (!(i == $scope.columns.length - 1)) {
-                header += ",";
-            }
-
-        }
-        for (var i = 0; i < $scope.columns.length; i++) {
-            field += $scope.columns[i].field;
-            if (!(i == $scope.columns.length - 1)) {
-                field += ",";
-            }
-        }
-        for (var i = 0; i < $scope.columns.length; i++) {
-            visibility += $scope.columns[i].show;
-            if (!(i == $scope.columns.length - 1)) {
-                visibility += ",";
-            }
-        }
-
-        for (var i = 0; i < $scope.columns.length; i++) {
-            filterValue += $scope.filters[$scope.columns[i].field];
-            if (!(i == $scope.columns.length - 1)) {
-                filterValue += ",";
-            }
-        }
-
-        var person = prompt("Please enter your name", "");
-        if (person != null) {
-            $scope.myfilter.push({ Id: $scope.id++, name: person, header: header, field: field, visibility: visibility, filterValue: filterValue });
-            $('#configModal').modal('hide');
-
-        }
-
-
-
-    };
-
-    $scope.selectFilter = function () {
-        var data = Enumerable.From($scope.myfilter).Where(function (x) {
-            return x.Id == $scope.selectedFilter
-        }).FirstOrDefault();
-
-        if ($scope.selectedFilter == 0) {
-            $scope.columns = angular.copy($scope.originalColumns);
-            $scope.filters = {
-                "Id": "",
-                "Title": "",
-                "Content": "",
-                "Status": "",
-                "IsActive": "",
-                "IsCommentAllowed": "",
-                "IsRatingAllowed": ""
-            };
-        }
-        else {
-
-
-            if (typeof data != 'undefined') {
-
-                delete $scope.newCol;
-                $scope.newCol = [];
-                var headers = data.header.split(',');
-                var field = data.field.split(',');
-                var visibility = data.visibility.split(',');
-                var filterValue = data.filterValue.split(',');
-                for (var i = 0; i < $scope.columns.length; i++) {
-
-                    $scope.newCol.push({ header: headers[i], field: field[i], show: (visibility[i] == "true") ? true : false, filterValue: filterValue[i] });
-                    $scope.filters[field[i]] = filterValue[i];
-                }
-                $scope.columns = angular.copy($scope.newCol);
-
-
-            }
-        }
-
-
-    };
-
-
+    //export table
     $scope.export = function (type) {
         $('#myTable').tableExport({ type: type, escape: 'false' });
     };
 
-    $scope.search = function () {
+    //for paging showing no of records
+    $scope.search = function ()
+    {
         $scope.paging.total = $scope.rowCollection.length;
         var a = ($scope.criteria.page - 1) * $scope.criteria.pagesize;
         var b = $scope.criteria.page * $scope.criteria.pagesize;
-        var count = $scope.rowCollection.slice(a, b);
-        $scope.paging.showing = count.length;
+        if (!(isNaN(a) && isNaN(b))) {
+            var count = $scope.rowCollection.slice(a, b);
+            if (!(count.length == 0)) {
+                $scope.paging.showing = count.length;
+            }
+            else {
+                $scope.criteria.page = $scope.criteria.page - 1;
+            }
+        }
         var totalpages = Math.ceil($scope.paging.total / $scope.criteria.pagesize);
         $scope.paging.totalpages = totalpages;
 
@@ -429,7 +363,8 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         }
 
     }
-
+      
+    //calling first time
     $scope.search();
 
     $scope.$watch('criteria', function (newValue, oldValue) {
@@ -451,6 +386,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         console.log(data);
     });
 
+    //empty topic model
     function empty() {
         $scope.topic = {
             "Id": "",
@@ -464,10 +400,12 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         }
     }
 
+    //open advance search model
     $scope.advanceSearchModal = function () {
         $('#advanceSearchModal').modal('show');
     }
 
+    // add row in advance search modal
     $scope.advanceSearch_Add = function () {
         $scope.advanceSearch.push({
             selectedField: '',
@@ -478,9 +416,13 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
 
         $('#advanceSearchModal').modal('show');
     }
+
+    // remove row in advance search modal
     $scope.advanceSearch_Remove = function () {
         $scope.advanceSearch.pop();
     }
+
+    //advance search 
     $scope.advanceSearch_Search = function () {
         var query = [];
         var result = [];
@@ -520,6 +462,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
 
 
         }
+       
         alert(query.length + ' records found')
         $scope.displayedCollection = angular.copy(query);
 
@@ -528,7 +471,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
     }
 
 
-
+    //advance search and save
     $scope.advanceSearch_SaveSearch = function () {
         var query = [];
         var result = [];
@@ -578,6 +521,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         }
     }
 
+    //reset advance search and table data to row collection
     $scope.reset = function () {
         $scope.displayedCollection = angular.copy($scope.rowCollection);
         $scope.advanceSearch = [
@@ -588,9 +532,11 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
                   operator: ''
               }
         ];
+        $scope.mySearch = '';
       
     }
 
+    //apply advance search
     $scope.applyChange = function () {
         if ($scope.mySearch != 'undefined' || $scope.mySearch != "") {
             var search = Enumerable.From($scope.savedSearch).Where(function (x) {
@@ -613,6 +559,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
 
     }
 
+    //operator selection in advance search
     function operator(op) {
         switch (op) {
             case '&&':
@@ -629,6 +576,8 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
 
         }
     }
+
+    // filter operations in advance search
     function getFilteredData(filter, field, value) {
         switch (filter) {
             case 'Contains': {
@@ -653,7 +602,24 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
     }
 
 
+    $scope.pdf = function () {
+        var doc = new jsPDF();
 
+        var specialElementHandlers = {
+            '#myTable': function (element, renderer) {
+                return true;
+            }
+        };
+
+        var html = $("#myTable").html();
+        doc.fromHTML(html, 200, 200, {
+            'width': 500,
+            'elementHandlers': specialElementHandlers
+        });
+        doc.save("Test.pdf");
+
+    }
+   
 }]);
 
 
@@ -674,7 +640,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
 
 
 
-
+// select one row in table
 app.directive('csSelect', function () {
     return {
         require: '^stTable',
@@ -709,6 +675,7 @@ app.directive('csSelect', function () {
     };
 });
 
+// select all row in table
 app.directive('csSelectAll', function ($rootScope) {
     return {
         require: '^stTable',
@@ -800,7 +767,7 @@ app.service('CommonOperation', function () {
 
 });
 
-//Collection
+//Main filters operations
 app.service('FilterService', function () {
 
     this.StartWith = function (items, char, key) {
@@ -878,7 +845,7 @@ app.service('FilterService', function () {
 
 
 
-
+// Main Filter
 app.filter('myFilter', ['FilterService', function (FilterService) {
 
     return function (items, options) {
@@ -915,6 +882,7 @@ app.filter('myFilter', ['FilterService', function (FilterService) {
     }
 }]);
 
+// return no of selected rows
 app.filter('selected', function () {
     return function (items) {
         return Enumerable.From(items).Where(function (x) {
@@ -923,6 +891,7 @@ app.filter('selected', function () {
     }
 });
 
+// alphabetic paging directive
 app.directive('alphabeticPaging', function ($rootScope) {
     return {
         restrict: 'E',
@@ -990,6 +959,69 @@ app.directive('alphabeticPaging', function ($rootScope) {
 });
 
 
+// local storage work
+app.factory('$localstorage', ['$window', function ($window) {
+    return {
+        set: function (key, value) {
+            $window.localStorage[key] = value;
+        },
+        get: function (key, defaultValue) {
+            if (typeof defaultValue == 'undefined') {
+                defaultValue = null;
+            }
+            return $window.localStorage[key] || defaultValue;
+        },
+        setObject: function (key, value) {
+            $window.localStorage[key] = JSON.stringify(value);
+        },
+        getObject: function (key) {
+            return JSON.parse($window.localStorage[key] || null);
+        }
+    }
+}]);
 
 
 
+
+
+function htmltopdf() {
+    //var pdf = new jsPDF('p', 'pt', 'letter');
+    //source = $('#myTable')[0]; //table Id
+    //specialElementHandlers = { 
+    //    '#bypassme': function (element, renderer) {
+    //        return true
+    //    }
+    //};
+    //margins = { //table margins and width
+    //    top: 80,
+    //    bottom: 60,
+    //    left: 40,
+    //    width: 522
+    //};
+    //pdf.fromHTML(
+    //source, 
+    //margins.left,
+    //margins.top, { 
+    //    'width': margins.width, 
+    //    'elementHandlers': specialElementHandlers
+    //},
+
+    //function (dispose) {
+    //    pdf.save('Download.pdf'); //Filename
+    //}, margins);
+
+    var pdf = new jsPDF('l', 'pt', 'letter');
+    pdf.cellInitialize();
+    pdf.setFontSize(10);
+    $.each($('#myTable tr'), function (i, row) {
+        $.each($(row).find("td, th"), function (j, cell) {
+            var txt = $(cell).text().trim() || " ";
+            var width = (j == 4) ? 40 : 70; //make with column smaller
+            pdf.cell(10, 50, width, 30, txt, i);
+        });
+    });
+
+    pdf.save('sample-file.pdf');
+
+
+}

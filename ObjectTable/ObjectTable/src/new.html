@@ -4,7 +4,7 @@
 <head>
     <title></title>
     <link href="bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
- 
+   
     <style>
         table {
             table-layout: fixed;
@@ -156,7 +156,6 @@
                         <div class="form-group">
                             <label>Status</label>
                             <select class="form-control" ng-init="topic.Status=topic.Status || 'Recent'" ng-model="topic.Status" required>
-                                <option value="">Select Status</option>
                                 <option value="Recent">Recent</option>
                                 <option value="Most Viewed">Most Viewed</option>
                                 <option value="Featured">Featured</option>
@@ -167,15 +166,14 @@
                         </div>
                         <div class="form-group">
                             <label>IsActive</label>
-                            <select class="form-control" ng-init="topic.IsActive=topic.IsActive || 'true'" ng-model="topic.IsActive" required>
-                                <option value="">Select IsActive</option>
+                            <select class="form-control" ng-model="topic.IsActive" required>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>IsCommentAllowed</label>
-                            <select class="form-control" ng-init="topic.IsCommentAllowed=topic.IsCommentAllowed || 'true'" ng-model="topic.IsCommentAllowed" required>
+                            <select class="form-control"  ng-model="topic.IsCommentAllowed" required>
                                 <option value="">Select Option</option>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
@@ -183,8 +181,7 @@
                         </div>
                         <div class="form-group">
                             <label>IsRatingAllowed</label>
-                            <select class="form-control" ng-init="topic.IsRatingAllowed=topic.IsRatingAllowed || 'true'" ng-model="topic.IsRatingAllowed" required>
-                                <option value="">Select Option</option>
+                            <select class="form-control"  ng-model="topic.IsRatingAllowed" required>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </select>
@@ -336,9 +333,9 @@
             <button type="button" ng-click="updateModal()" class="btn btn-warning">
                 Update Batch
             </button>
-            <button type="button" ng-click="showConfigModal()" class="btn btn-warning">
+            <!--<button type="button" ng-click="showConfigModal()" class="btn btn-warning">
                 Config
-            </button>
+            </button>-->
             <br />
             <br />
 
@@ -346,10 +343,10 @@
         </div>
 
         <div class="row">
-            <table>
+            <table id="exportTable">
                 <tr id="footerExport">
                     <td id="exportexcel" ng-click="export('excel')"><img src="../icons/xls.png" title="Export to Excel" /></td>
-                    <td id="exportpdf" ng-click="export('pdf')"><img src="../icons/pdf.png" title="Export to PDF" /></td>
+                    <td onclick="javascript:htmltopdf();"><img src="../icons/pdf.png" title="Export to PDF" /></td>
                     <td id="exportimage" ng-click="export('png')"><img src="../icons/png.png" title="Export to PNG" /></td>
                     <td id="exportcsv" ng-click="export('csv')"><img src="../icons/csv.png" title="Export to CSV" /></td>
                     <td id="exportword" ng-click="export('doc')"><img src="../icons/word.png" title="Export to Word" /></td>
@@ -416,38 +413,42 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-11">
-                <table st-table="displayedCollection" st-safe-src="rowCollection" id="myTable" class="table table-striped fadein fadeout">
-                    <thead>
-                        <tr>
-                            <th cs-select-all="rowCollection"></th>
-                            <th lr-drag-src="headers" lr-drop-target="headers" st-delay="false" ng-repeat="col in columns" ng-show="col.show" st-sort="{{col.field}}">{{col.header}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr dir-paginate="row in displayedCollection |  myFilter:options | itemsPerPage:criteria.pagesize" current-page="criteria.page">
-                            <td cs-select="row"></td>
-                            <td ng-repeat="col in columns" ng-show="col.show">
-                                <span ng-if="col.field!='IsActive' && col.field!='IsRatingAllowed' && col.field!='IsCommentAllowed'">
-                                    {{row[col.field]}}
-                                </span>
-                                <span ng-if="col.field == 'IsActive' || col.field == 'IsRatingAllowed' || col.field == 'IsCommentAllowed'">
-                                    <input type="checkbox" ng-model="row[col.field]" disabled />
-                                </span>
-                            </td>
-                            <td>
-                                <button type="button" ng-click="updateItem($index)" class="btn btn-sm btn-primary">+</button>
+            <div id="content" class="col-lg-11">
+                <div id="topicTable">
+                    <table st-table="displayedCollection" st-safe-src="rowCollection" id="myTable" class="table table-striped fadein fadeout">
+                        <thead>
+                            <tr>
+                                <th cs-select-all="rowCollection"></th>
+                                <th lr-drag-src="headers" lr-drop-target="headers" st-delay="false" ng-repeat="col in columns" ng-show="col.show" st-sort="{{col.field}}">{{col.header}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="row in displayedCollection |  myFilter:options | itemsPerPage:criteria.pagesize" current-page="criteria.page">
+                                <td cs-select="row"></td>
+                                <td ng-repeat="col in columns" ng-show="col.show">
+                                    <span ng-if="col.field!='IsActive' && col.field!='IsRatingAllowed' && col.field!='IsCommentAllowed'">
+                                        {{row[col.field]}}
+                                    </span>
+                                    <span ng-if="col.field == 'IsActive' || col.field == 'IsRatingAllowed' || col.field == 'IsCommentAllowed'">
+                                        <input type="checkbox" ng-model="row[col.field]" disabled />
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" ng-click="updateItem($index)" class="btn btn-sm btn-success">Edit</button>
 
-                                <button type="button" ng-click="removeItem($index)" class="btn btn-sm btn-danger">X</button>
-                            </td>
-                        </tr>
-
-
-                    </tbody>
+                                    <button type="button" ng-click="removeItem($index)" class="btn btn-sm btn-danger">Delete</button>
+                                </td>
+                            </tr>
 
 
+                        </tbody>
 
-                </table>
+
+
+                    </table>
+                </div>
+
+               
             </div>
             <div class="col-lg-1">
                    
@@ -500,9 +501,9 @@
 
       
 
-
      <script src="jquery-1.10.2.min.js"></script>
     <script src="jquery-ui.min.js" type="text/javascript"></script>
+    <script src="../Contents/jspdf.min.js" type="text/javascript"></script>
 
     <script type="text/javascript" src="angular.min.js"></script>
     <script src="lrDragNDrop.js"></script>
@@ -512,17 +513,16 @@
     <script src="smart-table.min.js"></script>
     <script src="linq.min.js"></script>
     <script src="dirPagination.js"></script>
-
+    
     <script type="text/javascript" src="new.js"></script>
-
+   
 
     <script src="../Contents/tableExport.js"></script>
     <script src="../Contents/jquery.base64.js"></script>
     <script src="../Contents/html2canvas.js"></script>
     <script src="../Contents/jspdf/libs/base64.js"></script>
     <script src="../Contents/jspdf/libs/sprintf.js"></script>
-    <script src="../Contents/jspdf/jspdf.js"></script>
-
+   
 
 </body>
 </html>

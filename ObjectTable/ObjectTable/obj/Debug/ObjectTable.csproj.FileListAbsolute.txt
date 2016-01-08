@@ -10,3 +10,9 @@ C:\Users\Ghazanfar\Desktop\Repo\ObjectTable_2\ObjectTable\ObjectTable\bin\Object
 C:\Users\Ghazanfar\Desktop\Repo\ObjectTable_2\ObjectTable\ObjectTable\obj\Debug\ObjectTable.csprojResolveAssemblyReference.cache
 C:\Users\Ghazanfar\Desktop\Repo\ObjectTable_2\ObjectTable\ObjectTable\obj\Debug\ObjectTable.dll
 C:\Users\Ghazanfar\Desktop\Repo\ObjectTable_2\ObjectTable\ObjectTable\obj\Debug\ObjectTable.pdb
+C:\Users\mgkhan\Documents\Visual Studio 2013\Projects\DataTableAngular\Table\ObjectTable\ObjectTable\bin\ObjectTable.dll.config
+C:\Users\mgkhan\Documents\Visual Studio 2013\Projects\DataTableAngular\Table\ObjectTable\ObjectTable\bin\ObjectTable.dll
+C:\Users\mgkhan\Documents\Visual Studio 2013\Projects\DataTableAngular\Table\ObjectTable\ObjectTable\bin\ObjectTable.pdb
+C:\Users\mgkhan\Documents\Visual Studio 2013\Projects\DataTableAngular\Table\ObjectTable\ObjectTable\obj\Debug\ObjectTable.csprojResolveAssemblyReference.cache
+C:\Users\mgkhan\Documents\Visual Studio 2013\Projects\DataTableAngular\Table\ObjectTable\ObjectTable\obj\Debug\ObjectTable.dll
+C:\Users\mgkhan\Documents\Visual Studio 2013\Projects\DataTableAngular\Table\ObjectTable\ObjectTable\obj\Debug\ObjectTable.pdb
