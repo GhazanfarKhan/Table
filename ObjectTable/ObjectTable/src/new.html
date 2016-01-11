@@ -75,14 +75,14 @@
                 </div>
                 <div class="modal-body">
                     <form ng-submit="batchUpdate()" name="BatchUpdateForm" novalidate>
-                        <div class="form-group">
+                        <!--<div class="form-group">
                             <label>Title</label>
                             <input type="text" ng-model="topic.Title" placeholder="Enter Title" class="form-control" required />
                         </div>
                         <div class="form-group">
                             <label>Content</label>
                             <input type="text" ng-model="topic.Content" placeholder="Enter Content" class="form-control" required />
-                        </div>
+                        </div>-->
                         <div class="form-group">
                             <label>Status</label>
                             <select class="form-control" ng-init="topic.Status=topic.Status || 'Recent'" ng-model="topic.Status" required>
@@ -460,35 +460,22 @@
 
 
         <div class="row" style="text-align:center;">
-            <dir-pagination-controls max-size="5"
+            <dir-pagination-controls template-url="dirPagination.tpl.html"
+                                      max-size="5"
                                      direction-links="true"
                                      auto-hide="false"
                                      boundary-links="true">
             </dir-pagination-controls>
+        
         </div>
 
         <div class="row" style="background-color:lightcyan;">
-            <div class="col-md-6">
-                <span ng-if="paging.total==0">
-                    Showing: 0
-                    of {{paging.total}} Records
-                </span>
-                <span ng-if="paging.total!=0">
-                    Showing: {{(criteria.page -1) * criteria.pagesize + 1}} -
-                    {{ ((criteria.page -1) * criteria.pagesize + paging.showing)}}
-                    of {{paging.total}} Records
-                </span>
 
-            </div>
+          
+
             <div class="col-md-6">
                 <div class="pull-right">
-                    Page: <input type='number'
-                                 ng-model='criteria.page'
-                                 min="1"
-                                 max="{{paging.totalpages}}"
-                                 style='width:70px;' />
-                    of {{paging.totalpages}}
-                    with page size <select ng-model="criteria.pagesize"
+                     Page size <select ng-model="criteria.pagesize"
                                            ng-options="obj as obj for obj in paging.pagingOptions" />
                 </div>
 

@@ -194,13 +194,6 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         id++;
         $scope.$emit('ItemAdded', $scope.rowCollection[$scope.rowCollection.length - 1]);
 
-        //paging
-        if ($scope.criteria.page == 0) {
-            $scope.criteria.page = 1;
-        }
-        else {
-            $scope.search();
-        }
     };
 
     //remove to the real data holder
@@ -210,11 +203,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
             $scope.$emit('ItemDeleted', $scope.rowCollection[index]);
             $scope.rowCollection.splice(index, 1);
            
-            //paging
-            $scope.search();
-            if ($scope.rowCollection.length == 0) {
-                $scope.criteria.page = 0;
-            }
+          
         }
     }
     //batch delete
@@ -234,13 +223,9 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
                 $scope.$emit('ItemDeleted', $scope.rowCollection[index]);
                
                 $scope.rowCollection.splice(index, 1);
-                $scope.search();
-
-
+     
             }
-            if ($scope.rowCollection.length == 0) {
-                $scope.criteria.page = 0;
-            }
+           
 
         }
         else {
@@ -301,9 +286,9 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         if (items.length > 0) {
             for (var i = 0; i < items.length; i++) {
                 var index = $scope.rowCollection.indexOf(items[i]);
-                $scope.$emit('ItemUpdated', { previous: $scope.rowCollection[index], current: $scope.topic });
-                $scope.rowCollection[index].Title = $scope.topic.Title;
-                $scope.rowCollection[index].Content = $scope.topic.Content;
+                //$scope.$emit('ItemUpdated', { previous: $scope.rowCollection[index], current: $scope.topic });
+                //$scope.rowCollection[index].Title = $scope.topic.Title;
+                //$scope.rowCollection[index].Content = $scope.topic.Content;
                 $scope.rowCollection[index].Status = $scope.topic.Status;
                 $scope.rowCollection[index].IsActive = ($scope.topic.IsActive == "true") ? true : false;
                 $scope.rowCollection[index].IsCommentAllowed = ($scope.topic.IsCommentAllowed == "true") ? true : false;
@@ -340,39 +325,6 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         $('#myTable').tableExport({ type: type, escape: 'false' });
     };
 
-    //for paging showing no of records
-    $scope.search = function ()
-    {
-        $scope.paging.total = $scope.rowCollection.length;
-        var a = ($scope.criteria.page - 1) * $scope.criteria.pagesize;
-        var b = $scope.criteria.page * $scope.criteria.pagesize;
-        if (!(isNaN(a) && isNaN(b))) {
-            var count = $scope.rowCollection.slice(a, b);
-            if (!(count.length == 0)) {
-                $scope.paging.showing = count.length;
-            }
-            else {
-                $scope.criteria.page = $scope.criteria.page - 1;
-            }
-        }
-        var totalpages = Math.ceil($scope.paging.total / $scope.criteria.pagesize);
-        $scope.paging.totalpages = totalpages;
-
-        if ($scope.rowCollection.length == 0) {
-            $scope.criteria.page = 0;
-        }
-
-    }
-      
-    //calling first time
-    $scope.search();
-
-    $scope.$watch('criteria', function (newValue, oldValue) {
-
-        if (!angular.equals(newValue, oldValue)) {
-            $scope.search();
-        }
-    }, true);
 
     //watching alphabetic page click
     $scope.$on('alphabeticPageClick', function (event, data) {
@@ -464,7 +416,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
         }
        
         alert(query.length + ' records found')
-        $scope.displayedCollection = angular.copy(query);
+        $scope.rowCollection = angular.copy(query);
 
 
 
@@ -533,6 +485,7 @@ app.controller('TableController', ['$scope', '$filter', '$timeout', '$rootScope'
               }
         ];
         $scope.mySearch = '';
+        $scope.options.searchValue = '';
       
     }
 
@@ -854,23 +807,18 @@ app.filter('myFilter', ['FilterService', function (FilterService) {
             case 'Contains':
                 {
                     return FilterService.Contains(items, options.searchValue, options.selectedField);
-                    break;
-                }
+                 }
             case 'Equals':
                 {
                     return FilterService.Equals(items, options.searchValue, options.selectedField);
-
-                    break;
                 }
             case 'StartWith':
                 {
                     return FilterService.StartWith(items, options.searchValue, options.selectedField);
-                    break;
                 }
             case 'EndWith':
                 {
                     return FilterService.EndWith(items, options.searchValue, options.selectedField);
-                    break;
                 }
             default: {
                 return items;

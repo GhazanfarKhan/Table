@@ -1,78 +1,73 @@
-﻿var app = angular.module('myApp', ['ngAnimate']);
-app.controller('AnimationController', function ($scope) {
-    $scope.selectedFilter = '';
-    $scope.list = [
-  {
-      "value": "test value with null formatter",
-      "formatter": "uppercase",
-  },
-  {
-      "value": "uppercase text",
-      "formatter": "uppercase",
-  },
-  {
-      "value": "2014-01-01",
-      "formatter": "date",
-  }
+﻿var app = angular.module('myApp', ['ngAnimate','angularUtils.directives.dirPagination']);
+
+
+app.controller('UsersController', function($scope, $http) {
+    $scope.users = [
+        {
+            name: 'Ghazanfar',
+            email:'kghazanfar4@gmail.com'
+        },
+        {
+            name: 'Hasan',
+            email: 'hasan@gmail.com'
+        },
+        {
+            name: 'Awais',
+            email: 'Awais@gmail.com'
+        },
+        {
+            name: 'Ashan',
+            email: 'Ashan@gmail.com'
+        },
+         {
+             name: 'Karim',
+             email: 'Karim@gmail.com'
+         },
+        {
+            name: 'Bilal',
+            email: 'Bilal@gmail.com'
+        },
+        {
+            name: 'Naseer',
+            email: 'Naseer@gmail.com'
+        },
+        {
+            name: 'Adnan',
+            email: 'Adnan@gmail.com'
+        },
+         {
+             name: 'Kashif',
+             email: 'Kashif@gmail.com'
+         },
     ];
+    $scope.totalUsers = 0;
+    $scope.usersPerPage = 5; // this should match however many results your API puts on one page
+    getResultsPage(1);
 
-    $scope.options = {
-        selectedField: '',
-        selectedFilter: '',
-        searchValue:''
+    $scope.pagination = {
+        current: 1
+    };
+
+    $scope.pageChanged = function(newPage) {
+        getResultsPage(newPage);
+    };
+
+    function getResultsPage(pageNumber) {
+        // this is just an example, in reality this stuff should be in a service
+
+
+      var result=  Enumerable.Range(1, 10).Take(5);
+      $scope.users = result.data.Items;
+      $scope.totalUsers = result.data.Count
+
+        //$http.get('path/to/api/users?page=' + pageNumber)
+        //    .then(function(result) {
+        //        $scope.users = result.data.Items;
+        //        $scope.totalUsers = result.data.Count
+        //    });
     }
-
-
-
-    $scope.friends = [
-        {
-            id: 1,
-            name: 'Andrew',
-            lastname:'John'
-        },
-        {
-
-            id: 2,
-            name: 'Will',
-            lastname:'Andrew'
-        },
-        {
-
-            id: 3,
-            name: 'Mark',
-            lastname: 'Kim'
-        },
-        {
-
-            id: 4,
-            name: 'Alice',
-            lastname: 'Bob'
-        },
-        {
-
-            id: 5,
-            name: 'Todd',
-            lastname: 'Teddy'
-        }];
-
-
-
-    $scope.list = [
-        { name: 'John', phone: '555-1276' },
-                         { name: 'Mary', phone: '800-BIG-MARY' },
-                         { name: 'Mike', phone: '555-4321' },
-                         { name: 'Adam', phone: '555-5678' },
-                         { name: 'Julie', phone: '555-8765' },
-                         { name: 'Juliette', phone: '555-5678' }];
-
-
-
-    $scope.myCustomFilter = function (player) {
-
-        return player.name.substring(0, 1).match(/A/gi);
-    }
-   
 });
+
 
 app.filter('picker', function ($filter) {
     return function (value, filterName) {

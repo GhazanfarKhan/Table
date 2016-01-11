@@ -2,78 +2,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml" ng-app="myApp">
 <head>
     <title></title>
-    <style>
-        .fade.ng-hide {
-            transition: 0.5s linear all;
-            opacity: 0;
-        }
-    </style>
+    <link href="bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+
+  
 </head>
-<body ng-controller="AnimationController">
-    <!--<div ng-repeat="row in list">
-        {{ row.value | picker:row.formatter }}
-    </div>
-    <input class="pull-right" ng-model="letter">-->
-    <div>
-        <label>Filter</label>
-        <select ng-model="options.selectedFilter">
-            <option value="uppercase" selected>uppercase</option>
-            <option value="StartWith">startsWithLetter</option>
+<body ng-controller="UsersController">
 
-        </select>  
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>UserName</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+        <tbody>
+            <tr dir-paginate="user in users | itemsPerPage: usersPerPage" total-items="totalUsers" current-page="pagination.current">
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
 
-    </div>
-  
-    <div>
-        <label>Fields</label>
-        <select ng-model="options.selectedField">
-            <option value="Id">Id</option>
-            <option value="name">Name</option>
-
-        </select>
-
-    </div>
-
-
-    <div>
-        <label>Search</label>
-        <input type="text" ng-model="options.searchValue" />
-    </div>
-
-        
-    <ul>
-        <li ng-repeat="friend in friends | myFilter:options ">
-            {{ friend.id }}  :  {{ friend.name }}
-        </li>
-    </ul>
-
-
-
-
-
-    <!--<label>Search: <input ng-model="searchText"></label>
-    <div>
-        <label>Fields</label>
-        <select ng-model="options.selectedField">
-            <option value="phone">phone</option>
-            <option value="name">Name</option>
-
-        </select>
-
-    </div>
-
-    <table id="searchTextResults">
-        <tr><th>Name</th><th>Phone</th></tr>
-        <tr ng-repeat="friend in list | filter:myCustomFilter" >
-            <td>{{friend.name}}</td>
-            <td>{{friend.phone}}</td>
-        </tr>
-    </table>-->
-    <!--//startsWithLetter:letter-->
-  
     <script type="text/javascript" src="angular.min.js"></script>
     <script src="angular-animate.min.js"></script>
+    <script src="dirPagination.js"></script>
     <script type="text/javascript" src="app3.js"></script>
+    <script src="linq.min.js"></script>
 
 </body>
 </html>
