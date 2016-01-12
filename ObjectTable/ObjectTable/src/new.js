@@ -729,7 +729,8 @@ app.service('FilterService', function () {
             var letterMatch = new RegExp(char, 'i');
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                if (letterMatch.test(item[key].substring(0, 1))) {
+                var val = "" + item[key];
+                if (letterMatch.test(val.substring(0, 1))) {
                     filtered.push(item);
                 }
             }
@@ -747,7 +748,8 @@ app.service('FilterService', function () {
             var letterMatch = new RegExp(char, 'i');
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                if (letterMatch.test(item[key].substring(item[key].length - 1, item[key].length))) {
+                var val = "" + item[key];
+                if (letterMatch.test(val.substring(item[key].length - 1, item[key].length))) {
                     filtered.push(item);
                 }
             }
@@ -763,7 +765,8 @@ app.service('FilterService', function () {
         if (char != "" && key != "") {
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                if (item[key].indexOf(char) !== -1) {
+                var val = "" + item[key];
+                if (val.indexOf(char) !== -1) {
                     filtered.push(item);
                 }
 
